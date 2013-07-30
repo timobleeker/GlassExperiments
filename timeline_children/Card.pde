@@ -33,9 +33,10 @@ class Card {
     image(image, location.x, location.y);
   }
   
-  public void addChild(String f, int n) {
+  public void addChild(String f, int p, int n) {
    children++;
    child_cards.add(new Card(f, n));
+   child_cards.get(n).parent = p;
    println("child added");
   }
   

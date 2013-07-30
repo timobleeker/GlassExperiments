@@ -1,7 +1,10 @@
-//timeline mockup
+//timeline Vertical Children
 //Timo Bleeker - July 2013
 
-/** This is a timeline mockup that can be used to implement new interaction techniques. 
+/** This is a timeline that shows child cards (or cards within a bundle) in a vertical timeline. 
+ ** I haven't figured out how to check if files exist with Processing for Android, since apparently
+ ** the sketch data folder on android is not created. I currently don't know where it actually stores the images.
+ ** Because of this, we have to load child cards manually (we can't check if they are there and then add them).
  ** Touch event code is based on work by Mark Billinghurst.
  */
 
@@ -42,7 +45,6 @@ float touchPadScaleY;
 float xpos, ypos;
 
 void setup() {
-
   translation = new PVector(0, 0);
   target_translation = new PVector(0, 0);
   offset = new PVector(0, 0);
@@ -55,10 +57,13 @@ void setup() {
   for (int i = 0; i <= max_cards; i++) {
     cards.add(new Card(i + ".jpg", i));
   }
-  cards.get(3).addChild("3-0.jpg", 0);
-  cards.get(3).addChild("3-1.jpg", 1);
-  cards.get(3).addChild("3-2.jpg", 2);
-  
+
+  //at the moment we have to add the child cards manually to each card with .addChild(String filename, int parentcard, int, cardnumber)
+  cards.get(2).addChild("2-0.jpg", 2, 0);
+  cards.get(3).addChild("3-0.jpg", 3, 0);
+  cards.get(3).addChild("3-1.jpg", 3, 1);
+  cards.get(3).addChild("3-2.jpg", 3, 2);
+
   //set the initial translation to show the start_card
   translation.x = -start_card * cards.get(0).size.x;
   offset.x = -translation.x; 
@@ -73,6 +78,7 @@ void setup() {
     }
   }
 }
+
 
 void draw() {
   background(0);
@@ -106,9 +112,6 @@ void draw() {
   }
 }
 
-
-
-
 //Glass Touch Events - reads from touch pad
 public boolean dispatchGenericMotionEvent(MotionEvent event) {
   float x = event.getX();                         // get x/y coords of touch event
@@ -126,7 +129,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     ypos = y*touchPadScaleY;
     fingerTouch = 1;
     x_start = xpos;
-    //check what card is in view on the DOWN event to update the current card.
+    //check what card is in view on the DOWN event to update the current card. 
     for (int i = 0; i < max_cards; i++) {
       int loc_x = (int)cards.get(i).location.x;
       if (loc_x > -25 && loc_x < 25) {
@@ -135,8 +138,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
       for (int j = 0; j < cards.get(i).children; j++) {
         int loc_y = (int)cards.get(i).child_cards.get(j).location.y;
         println("loc_y" + loc_y);
-        if (loc_y > -50 && loc_y < 50) {
-
+        if (loc_y > -25 && loc_y < 25) {
           current_card_y = j + 1;
         }
       }
@@ -161,6 +163,8 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
       translation.y = dx + offset.y;
       translation.y = -translation.y;
     }
+    
+    //to differentiate between taps and swipes we check how often the MOVE MotionEvent is given
     moves++;
 
     break;
@@ -183,16 +187,17 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     } 
     else if (dx > stickiness && scroll_vertical) {
       //we swiped forwards
-      // if (current_card_y != max_cards-1) //change this to y max cards
-      target_card_y = current_card_y + 1;
+      if (current_card_y < cards.get(current_card).children) //change this to y max cards
+        target_card_y = current_card_y + 1;
     } 
     else if (dx < -stickiness && scroll_vertical) {
       //we swiped backwards
-      //if (current_card_y != 0)
-      target_card_y = current_card_y - 1;
-       if(target_card_y == 0){
-         current_card_y = 0;
-       }
+      if (current_card_y != 0) {
+        target_card_y = current_card_y - 1;
+        if (target_card_y == 0) {
+          current_card_y = 0;
+        }
+      }
     }
     println("current: " + current_card_y +  " target: " + target_card_y);
 
@@ -203,11 +208,12 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     offset.x = -target_translation.x; 
     offset.y = -target_translation.y; 
 
-    if (!scroll_vertical && moves < 4) {
+    //if the MOVE motionEvent was given less than 5 times, the user probably wanted to tap. Change scrolling mode.
+    if (!scroll_vertical && moves < 5 && cards.get(current_card).children != 0 ) {
       scroll_vertical = true;
       moves = 0;
     } 
-    else if (moves < 4) {
+    else if (moves < 5) {
       scroll_vertical = false;
       translation.y = 0;
       offset.y = 0;
