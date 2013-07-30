@@ -78,6 +78,17 @@ void draw() {
   }
 }
 
+int currentCard(){
+   for (int i = 0; i < max_cards; i++) {
+   }
+}
+
+
+
+
+
+
+
 //Glass Touch Events - reads from touch pad
 public boolean dispatchGenericMotionEvent(MotionEvent event) {
   float x = event.getX();                         // get x/y coords of touch event
