@@ -3,8 +3,7 @@ class Card {
   PVector location;     // x and y location
   PVector size;         // width and height
   PImage image;         // image object
-  ArrayList<Card> child_cards =  new ArrayList<Card>();
-
+  
   //currently unused. For future implementations.
   int card_n;           // card number, gets assigned with constructor
   int children;         // number of children  
@@ -12,16 +11,15 @@ class Card {
   String name;          // name of the card
   //
 
-  public Card(String f, int n)
+  public Card(String i, int n)
   {
     card_n = n;
-    image = loadImage(f);
+    image = loadImage(i);
 
     int w = image.width;
     int h = image.height;
     size = new PVector(w, h);
     location = new PVector(0, 0);
-    children = 0;
   }
 
   public void setLocation(int x, int y) {
@@ -30,31 +28,11 @@ class Card {
   } 
 
   public void drawImage() {
-      image(image, location.x, location.y);
-  }
-
-  public void addChild(String f, int p, int n) {
-    children++;
-    child_cards.add(new Card(f, n));
-    child_cards.get(n).parent = p;
-    println("child added");
-  }
-
-  public PVector getSize() {
-    return size;
+    image(image, location.x, location.y);
   }
   
-  public void removeChild(int j){
-    child_cards.remove(j);
-    println("removed null child card");
-  }
-  
-  public PImage returnImage(){
-   if(image != null){
-   return image; 
-   } else {
-     return null;
-   }
+  public PVector getSize(){
+   return size; 
   }
 }
 

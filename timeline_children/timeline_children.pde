@@ -8,20 +8,25 @@
  ** Touch event code is based on work by Mark Billinghurst.
  */
 
+import apwidgets.*;
 import android.view.MotionEvent;
 
 ArrayList<Card> cards = new ArrayList<Card>();
 
-int max_cards = 8;             // Amount of Cards. Make sure there are enough images named 0.jpg to n.jpg
+int max_cards = 16;             // Amount of Cards. Make sure there are enough images named 0.jpg to n.jpg
 
 PVector translation; 
 PVector target_translation;
 PVector offset;
+
 int start_card = 3;            // Card that will be shown on Startup
-int target_card = start_card;  // The next card that will be shown on UP event
-int current_card = start_card; // The card currently in view 
-int target_card_y = 0;
+int target_card;  // The next card that will be shown on UP event
+int current_card; // The card currently in view 
+int prev_card;
 int current_card_y = 0;
+int target_card_y;
+int prev_card_y;
+
 int stickiness = 50;     // The dx that has to be detected before we move to the next/prev card. Higher means we need to swipe more
 int tween_speed = 20;
 boolean scroll_vertical = false;
@@ -44,10 +49,21 @@ float touchPadScaleX;
 float touchPadScaleY;
 float xpos, ypos;
 
+//audio events
+APMediaPlayer player;
+
 void setup() {
   translation = new PVector(0, 0);
   target_translation = new PVector(0, 0);
   offset = new PVector(0, 0);
+
+
+  //set up cards
+  target_card = start_card;  // The next card that will be shown on UP event
+  current_card = start_card;// The card currently in view 
+  prev_card = start_card;
+  prev_card_y = current_card_y;
+  target_card_y = current_card_y;
 
   //set the touch scale factor
   touchPadScaleX = (float)myScreenWidth/padWidth;
@@ -55,14 +71,39 @@ void setup() {
 
   //load the images
   for (int i = 0; i <= max_cards; i++) {
-    cards.add(new Card(i + ".jpg", i));
+    cards.add(new Card(i + ".jpeg", i));
   }
 
+  /*WORK IN PROGRESS
+   **
+   int n = 0;
+   while (n <= max_cards) {
+   // println("added parent card: " + n );
+   cards.add(new Card(n + ".jpeg", n));
+   n++;
+   // boolean max = false;
+   // int j = 0;
+  /* while (max == false) {
+   println("added child card: " + j);
+   cards.get(n).addChild(n + "-" + j + ".jpeg", n, j);
+   if (cards.get(n).child_cards.get(j). == null) { 
+   cards.get(n).removeChild(j);
+   max = true;
+   }
+   j++;
+   }
+   }
+   **
+   **WORK IN PROGRESS
+   */
+
   //at the moment we have to add the child cards manually to each card with .addChild(String filename, int parentcard, int, cardnumber)
-  cards.get(2).addChild("2-0.jpg", 2, 0);
-  cards.get(3).addChild("3-0.jpg", 3, 0);
-  cards.get(3).addChild("3-1.jpg", 3, 1);
-  cards.get(3).addChild("3-2.jpg", 3, 2);
+  cards.get(2).addChild("2-0.jpeg", 2, 0);   
+  cards.get(3).addChild("3-0.jpeg", 3, 0);
+  cards.get(3).addChild("3-1.jpeg", 3, 1);
+  cards.get(6).addChild("6-0.jpeg", 6, 0);
+  cards.get(8).addChild("8-0.jpeg", 8, 0);
+
 
   //set the initial translation to show the start_card
   translation.x = -start_card * cards.get(0).size.x;
@@ -77,8 +118,14 @@ void setup() {
       cards.get(i).child_cards.get(j).drawImage();
     }
   }
-}
 
+
+  player = new APMediaPlayer(this); //create new APMediaPlayer
+  player.setMediaFile("focus.mp3"); //set the file (files are in data folder)
+  player.start(); //start play back
+  //player.setLooping(true); //restart playback end reached
+  player.setVolume(1.0, 1.0); //Set left and right volumes. Range is from 0.0 to 1.0
+}
 
 void draw() {
   background(0);
@@ -101,7 +148,8 @@ void draw() {
   else {
     //if there's no UP event yet, translate cards according to finger movement
     for (int i = 0; i < max_cards; i++) {
-      cards.get(i).setLocation((int)(translation.x + cards.get(i).size.x * i), 0 + (int)translation.y);
+      int loc = (int)(translation.x + cards.get(i).size.x * i);
+      cards.get(i).setLocation(loc, 0 + (int)translation.y);
       cards.get(i).drawImage();
       for (int j = 0; j < cards.get(i).children; j++) {
         cards.get(i).child_cards.get(j).setLocation((int)cards.get(i).location.x, (int)cards.get(i).size.y * (j + 1)+ (int)translation.y);
@@ -163,7 +211,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
       translation.y = dx + offset.y;
       translation.y = -translation.y;
     }
-    
+
     //to differentiate between taps and swipes we check how often the MOVE MotionEvent is given
     moves++;
 
@@ -224,6 +272,18 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     } 
     else {
       moves = 0;
+    }
+
+          //if card has changed play sound
+    if (target_card != current_card) {
+      //play sound
+      player.start();
+    }
+
+    if (target_card_y != current_card_y) {
+
+      //play sound
+      player.start();
     }
 
     break;
