@@ -22,10 +22,8 @@ PVector offset;
 int start_card = 3;            // Card that will be shown on Startup
 int target_card;  // The next card that will be shown on UP event
 int current_card; // The card currently in view 
-int prev_card;
 int current_card_y = 0;
 int target_card_y;
-int prev_card_y;
 
 int stickiness = 50;     // The dx that has to be detected before we move to the next/prev card. Higher means we need to swipe more
 int tween_speed = 20;
@@ -61,8 +59,6 @@ void setup() {
   //set up cards
   target_card = start_card;  // The next card that will be shown on UP event
   current_card = start_card;// The card currently in view 
-  prev_card = start_card;
-  prev_card_y = current_card_y;
   target_card_y = current_card_y;
 
   //set the touch scale factor
@@ -274,7 +270,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
       moves = 0;
     }
 
-          //if card has changed play sound
+    //if card has changed play sound
     if (target_card != current_card) {
       //play sound
       player.start();
