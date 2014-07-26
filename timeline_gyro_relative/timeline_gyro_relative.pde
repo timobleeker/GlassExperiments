@@ -7,7 +7,6 @@
  ** Touch event code is based on work by Mark Billinghurst.
  ** I left the the touch code in, for easy hacking
  **
- ** TODO: edit program to use accelerometer
  */
 
 import android.view.MotionEvent;

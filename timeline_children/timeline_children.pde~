@@ -95,10 +95,8 @@ void setup() {
 
   //at the moment we have to add the child cards manually to each card with .addChild(String filename, int parentcard, int, cardnumber)
   cards.get(2).addChild("2-0.jpeg", 2, 0);   
-  //add menu cards for card 3
-  for (int i = 0; i < 7; i++) {
-    cards.get(3).addChild("3-" + i + ".jpeg", 3, i);
-  }
+  cards.get(3).addChild("3-0.jpeg", 3, 0);
+  cards.get(3).addChild("3-1.jpeg", 3, 1);
   cards.get(6).addChild("6-0.jpeg", 6, 0);
   cards.get(8).addChild("8-0.jpeg", 8, 0);
 

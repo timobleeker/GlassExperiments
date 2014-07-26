@@ -1,11 +1,9 @@
-//timeline with submenu - Gyro control - absolute
+//timeline with submenu - Gyro control - relative
 //Timo Bleeker - August 2013
 
 /** This timeline mockup uses normal swiping gestures to switch cards in the main timeline.
- ** The Clock card has a horizontal submenu accessed by tapping while on the clock card.
- ** The submenu is navigated through by looking right and left. 
- **
- ** Code is a little crazy..
+ ** The Clock card has a submenu accessed by tapping while on the clock card.
+ ** The submenu is navigated through by slightly tilting the head up or down.
  ** 
  ** Touch event code is based on work by Mark Billinghurst.
  **
@@ -24,12 +22,12 @@ PVector translation;
 PVector target_translation;
 PVector offset;
 PVector gyro;
-int gyro_speed = 160; // Amount of translation per gyro unit. Higher means faster translation
-
+float gyro_speed = .5; // Amount of translation per gyro unit. Higher means faster translation
+float accel;
 boolean submenu;
 
 int start_card = 3;            // Card that will be shown on Startup
-int target_card;               // The next card that will be shown on UP event
+int target_card;  // The next card that will be shown on UP event
 int current_card;
 int current_sub_card;
 int target_sub_card;
@@ -61,6 +59,7 @@ APMediaPlayer player;
 
 void setup() {
   frameRate(30);
+
   translation = new PVector(0, 0);
   target_translation = new PVector(0, 0);
   offset = new PVector(0, 0);
@@ -107,60 +106,55 @@ void setup() {
 
 void draw() {
   background(0);
-  println(translation.x);
+  accel += gyro.x;
+  println(accel + "  " + translation.y);
   //on UP event, motion tween to target card
-  if (touchEvent == "UP") {
-    if (!submenu) {
+  if (!submenu) {
+    if (touchEvent == "UP") {
       for (int i = 0; i < max_cards; i++) {
         translation.x += (target_translation.x - translation.x)/tween_speed;
         int loc = (int)(translation.x + cards.get(i).size.x * i);
         cards.get(i).setLocation(loc, 0);
         cards.get(i).drawImage();
       }
-    } 
-    else {
-      if (sensor.isStarted()) {
-        if (translation.x >= 0 && gyro.y > 0 ) {
-          translation.x = 0;
-        } 
-        else if (translation.x <= -cards.get(0).size.x * (cards.get(current_card).children - 1) && gyro.y < 0) {
-          translation.x = -cards.get(0).size.x * (cards.get(current_card).children - 1);
-        }
-        else {
-          translation.x += gyro.y * gyro_speed;
-        }
-      }
-      for (int j = 0; j < cards.get(current_card).children; j++) {
-        int sub_loc = (int)(translation.x + cards.get(j).size.x * j);
-        cards.get(current_card).child_cards.get(j).setLocation(sub_loc, 0);
-        cards.get(current_card).child_cards.get(j).drawImage();
-      }
     }
-  } 
-  else {
-    //if there's no UP event yet, translate cards according to finger movement
-    if (!submenu) {
+    else {
+      //if there's no UP event yet, translate cards according to finger movement
       for (int i = 0; i < max_cards; i++) {
         int loc = (int)(translation.x + cards.get(i).size.x * i);
         cards.get(i).setLocation(loc, 0 + (int)translation.y);
         cards.get(i).drawImage();
       }
-    } 
-    else {
-      if (sensor.isStarted()) {
-        if (translation.x >= 0 && gyro.y > 0 ) {
-          translation.x = 0;
-        } 
-        else if (translation.x <= -cards.get(0).size.x * (cards.get(current_card).children - 1) && gyro.y < 0) {
-          translation.x = -cards.get(0).size.x * (cards.get(current_card).children - 1);
-        }
-        else {
-          translation.x += gyro.y * gyro_speed;
-        }
-      }
+    }
+  } 
+  else {
+    if (accel < 2 && accel > - 2)
+    {
+      target_translation.y = round(translation.y / cards.get(0).size.y) * cards.get(0).size.y;  
       for (int j = 0; j < cards.get(current_card).children; j++) {
-        int sub_loc = (int)(translation.x + cards.get(j).size.x * j);
-        cards.get(current_card).child_cards.get(j).setLocation(sub_loc, 0);
+        translation.y += (target_translation.y - translation.y)/tween_speed;
+        int sub_loc_y = (int)(translation.y + cards.get(j).size.y * j);
+        cards.get(current_card).child_cards.get(j).setLocation(0, sub_loc_y);
+        cards.get(current_card).child_cards.get(j).drawImage();
+      }
+    }    
+    else {
+      //don't move further on the first and last cards
+      if (translation.y >= 0 && accel > 0 ) {
+        translation.y = 0;
+        accel = 0;
+      } 
+      else if (translation.y <= -cards.get(0).size.y * (cards.get(current_card).children - 1) && accel < 0) {
+        translation.y = -cards.get(0).size.y * (cards.get(current_card).children - 1);
+        accel = 0;
+      }
+
+      for (int j = 0; j < cards.get(current_card).children; j++) {
+        if (sensor.isStarted()) {
+          translation.y += accel * gyro_speed;
+        }
+        int sub_loc_y = (int)(translation.y + cards.get(j).size.y * j);
+        cards.get(current_card).child_cards.get(j).setLocation(0, sub_loc_y);
         cards.get(current_card).child_cards.get(j).drawImage();
       }
     }
@@ -195,8 +189,8 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     } 
     else {
       for (int i = 0; i < cards.get(current_card).child_cards.size(); i++) {
-        int loc_x = (int) cards.get(current_card).child_cards.get(i).location.x;
-        if (loc_x > -25 && loc_x < 25) {
+        int loc_y = (int) cards.get(current_card).child_cards.get(i).location.y;
+        if (loc_y > -25 && loc_y < 25) {
           current_sub_card = i;
         }
       }
@@ -230,13 +224,17 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     //simple way to check wether we swiped forward or backward on the touchpad   
     if (dx > stickiness && !submenu) {
       //we swiped forwards
-      if (current_card != max_cards-1)
+      if (current_card != max_cards-1) {
         target_card = current_card + 1;
+        player.start();
+      }
     } 
     else if (dx < -stickiness && !submenu) {
       //we swiped backwards
-      if (current_card != 0)
+      if (current_card != 0) {
         target_card = current_card - 1;
+        player.start();
+      }
     }
 
     //update target_translation for the motion tween

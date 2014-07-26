@@ -1,12 +1,11 @@
-//timeline with submenu - Gyro control - absolute
+//timeline with submenu - Gyro control - absolute vertical
 //Timo Bleeker - August 2013
 
 /** This timeline mockup uses normal swiping gestures to switch cards in the main timeline.
- ** The Clock card has a horizontal submenu accessed by tapping while on the clock card.
- ** The submenu is navigated through by looking right and left. 
- **
- ** Code is a little crazy..
- ** 
+ ** The Clock card has a vertical submenu accessed by tapping while on the clock card.
+ ** The submenu is navigated through by looking up and down. 
+ ** This is very uncomfortable for large menu's. However, it could be useful for a menu that just has 2 options:
+ ** For instance a yes / no menu which shows a yes card when looking down, and a no card when looking up.
  ** Touch event code is based on work by Mark Billinghurst.
  **
  */
@@ -24,12 +23,12 @@ PVector translation;
 PVector target_translation;
 PVector offset;
 PVector gyro;
-int gyro_speed = 160; // Amount of translation per gyro unit. Higher means faster translation
+int gyro_speed = 200; // Amount of translation per gyro unit. Higher means faster translation
 
 boolean submenu;
 
 int start_card = 3;            // Card that will be shown on Startup
-int target_card;               // The next card that will be shown on UP event
+int target_card;  // The next card that will be shown on UP event
 int current_card;
 int current_sub_card;
 int target_sub_card;
@@ -120,19 +119,19 @@ void draw() {
     } 
     else {
       if (sensor.isStarted()) {
-        if (translation.x >= 0 && gyro.y > 0 ) {
-          translation.x = 0;
+        if (translation.y >= 0 && gyro.x > 0 ) {
+          translation.y = 0;
         } 
-        else if (translation.x <= -cards.get(0).size.x * (cards.get(current_card).children - 1) && gyro.y < 0) {
-          translation.x = -cards.get(0).size.x * (cards.get(current_card).children - 1);
+        else if (translation.y <= -cards.get(0).size.y * (cards.get(current_card).children - 1) && gyro.x < 0) {
+          translation.y = -cards.get(0).size.y * (cards.get(current_card).children - 1);
         }
         else {
-          translation.x += gyro.y * gyro_speed;
+          translation.y += gyro.x * gyro_speed;
         }
       }
       for (int j = 0; j < cards.get(current_card).children; j++) {
-        int sub_loc = (int)(translation.x + cards.get(j).size.x * j);
-        cards.get(current_card).child_cards.get(j).setLocation(sub_loc, 0);
+        int sub_loc_y = (int)(translation.y + cards.get(j).size.y * j);
+        cards.get(current_card).child_cards.get(j).setLocation(0, sub_loc_y);
         cards.get(current_card).child_cards.get(j).drawImage();
       }
     }
@@ -148,19 +147,19 @@ void draw() {
     } 
     else {
       if (sensor.isStarted()) {
-        if (translation.x >= 0 && gyro.y > 0 ) {
-          translation.x = 0;
+        if (translation.y >= 0 && gyro.x > 0 ) {
+          translation.y = 0;
         } 
-        else if (translation.x <= -cards.get(0).size.x * (cards.get(current_card).children - 1) && gyro.y < 0) {
-          translation.x = -cards.get(0).size.x * (cards.get(current_card).children - 1);
+        else if (translation.y <= -cards.get(0).size.y * (cards.get(current_card).children - 1) && gyro.x < 0) {
+          translation.y = -cards.get(0).size.y * (cards.get(current_card).children - 1);
         }
         else {
-          translation.x += gyro.y * gyro_speed;
+          translation.y += gyro.x * gyro_speed;
         }
       }
       for (int j = 0; j < cards.get(current_card).children; j++) {
-        int sub_loc = (int)(translation.x + cards.get(j).size.x * j);
-        cards.get(current_card).child_cards.get(j).setLocation(sub_loc, 0);
+        int sub_loc_y = (int)(translation.y + cards.get(j).size.y * j);
+        cards.get(current_card).child_cards.get(j).setLocation(0, sub_loc_y);
         cards.get(current_card).child_cards.get(j).drawImage();
       }
     }
@@ -195,8 +194,8 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     } 
     else {
       for (int i = 0; i < cards.get(current_card).child_cards.size(); i++) {
-        int loc_x = (int) cards.get(current_card).child_cards.get(i).location.x;
-        if (loc_x > -25 && loc_x < 25) {
+        int loc_y = (int) cards.get(current_card).child_cards.get(i).location.y;
+        if (loc_y > -25 && loc_y < 25) {
           current_sub_card = i;
         }
       }
@@ -230,13 +229,17 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     //simple way to check wether we swiped forward or backward on the touchpad   
     if (dx > stickiness && !submenu) {
       //we swiped forwards
-      if (current_card != max_cards-1)
+      if (current_card != max_cards-1){
         target_card = current_card + 1;
+        player.start();
+      }
     } 
     else if (dx < -stickiness && !submenu) {
       //we swiped backwards
-      if (current_card != 0)
+      if (current_card != 0){
         target_card = current_card - 1;
+        player.start();
+      }
     }
 
     //update target_translation for the motion tween
