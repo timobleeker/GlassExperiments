@@ -1,3 +1,20 @@
+/*
+* Copyright, 2013, 2014, by Timo Bleeker
+*
+* This collection of experiments is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This collection is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 //gestures.pde
 //Timo Bleeker - July 2013
 
@@ -42,7 +59,7 @@ void setup() {
 
 void draw() {
   // Draw on black background
-  background(bg_color); 
+  background(bg_color);
 
   //draw red circle when the user is touching the screen
   if (fingerTouch==1) {
@@ -50,14 +67,14 @@ void draw() {
     ellipse(xpos, ypos, 50, 50);
   }
   print(swipeAction(down_x, down_y, up_x, up_y));
-  
+
   if(swipeAction(down_x, down_y, up_x, up_y) == "forward"){
     bg_color = color (0,255,0);
   } else if (swipeAction(down_x, down_y, up_x, up_y) == "backward"){
-    bg_color = color (0,0,0); 
+    bg_color = color (0,0,0);
   }
-  
-  
+
+
 }
 
 //Glass Touch Events - reads from touch pad
@@ -100,7 +117,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     // bg_color = color(0,0,255);
     break;
 
-    //other events 
+    //other events
   default:
     touchEvent = "OTHER (CODE " + action + ")";  // default text on other event
   }
@@ -111,10 +128,10 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
 String swipeAction(float downx, float downy, float upx, float upy) {
   float dx = downx - upx;
   float dy = downy - upy;
-  //println(dx + "  " + dy); 
-  
+  //println(dx + "  " + dy);
+
   String gestureType = "none";
-  
+
   if(dx > 500){
     gestureType = "forward";
   } else if (dx < -500){
@@ -122,7 +139,6 @@ String swipeAction(float downx, float downy, float upx, float upy) {
   } else {
     gestureType = "none";
   }
-  
+
   return gestureType;
 }
-

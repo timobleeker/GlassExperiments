@@ -1,7 +1,24 @@
+/*
+* Copyright, 2013, 2014, by Timo Bleeker
+*
+* This collection of experiments is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This collection is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 //timeline mockup
 //Timo Bleeker - July 2013
 
-/** This is a timeline mockup that can be used to implement new interaction techniques. 
+/** This is a timeline mockup that can be used to implement new interaction techniques.
  ** It has no tweens, just simple snapping to the closest card.
  ** Touch event code is based on work by Mark Billinghurst
  */
@@ -9,7 +26,7 @@
 import android.view.MotionEvent;
 
 PImage[] images = new PImage[8];
-float rotation; 
+float rotation;
 float target_rotation;
 float offset = 0;
 int start_image = 3;
@@ -54,7 +71,7 @@ void draw() {
       rotation += (target_rotation - rotation)/20;
       image(images[i], rotation + images[i].width * i - images[i].width * start_image, 0);
     }
-  } 
+  }
   else {
     for (int i = 0; i < images.length; i++) {
       image(images[i], rotation + images[i].width * i - images[i].width *  start_image, 0);
@@ -103,25 +120,24 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     if (card < -(images.length - 1) + start_image) {
       println("Reached end");
       target_rotation = (card +1) * images[0].width;
-    } 
+    }
     else if (card > start_image ) {
       println("Reached end");
       target_rotation = (card - 1) * images[0].width;
-    } 
+    }
     else {
       target_rotation = card * images[0].width;
     }
 
-    offset = target_rotation; 
+    offset = target_rotation;
     println("UP");
     break;
 
 
-    //other events 
+    //other events
   default:
     touchEvent = "OTHER (CODE " + action + ")";  // default text on other event
   }
 
   return super.dispatchTouchEvent(event);        // pass data along when done!
 }
-

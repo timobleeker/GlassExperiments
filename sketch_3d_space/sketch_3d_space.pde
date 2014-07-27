@@ -1,7 +1,24 @@
+/*
+* Copyright, 2013, 2014, by Timo Bleeker
+*
+* This collection of experiments is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This collection is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 //
 //Timo Bleeker - July 2013
 
-/** 
+/**
  */
 
 import ketai.sensors.*;
@@ -24,7 +41,7 @@ void draw() {
 
   println("rotX: " + orientation.x + " rotY: " + orientation.y + " rotZ: " + orientation.z);
 
-  background(0);  
+  background(0);
 
   pushMatrix();
   translate(displayWidth/2, displayHeight/2, 300);
@@ -81,7 +98,7 @@ void drawGrid() {
   for (int i=-1000;i<1040;i+=40)
   {
     pushMatrix();
-    translate(0, 0, 100);    
+    translate(0, 0, 100);
     stroke(0, 255, 0);
     line(-1000, i, 1000, i);
     stroke(255, 0, 0);
@@ -105,13 +122,12 @@ void drawCompass() {
   fill(255, 255, 0);
   ellipse(0, 25, 20, 20);
   ellipse(displayWidth, 25, 20, 20);
-  
+
   noFill();
   strokeWeight(6);
   stroke(0);
   rect(map(orientation.x, 0, 360, 0, 640)-50,0,100,50);
-  
-  
+
+
 
 }
-

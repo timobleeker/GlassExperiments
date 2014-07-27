@@ -1,12 +1,29 @@
+/*
+* Copyright, 2013, 2014, by Timo Bleeker
+*
+* This collection of experiments is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This collection is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 //timeline with submenu - Gyro control - absolute
 //Timo Bleeker - August 2013
 
 /** This timeline mockup uses normal swiping gestures to switch cards in the main timeline.
  ** The Clock card has a horizontal submenu accessed by tapping while on the clock card.
- ** The submenu is navigated through by looking right and left. 
+ ** The submenu is navigated through by looking right and left.
  **
- ** Code is a little crazy..
- ** 
+ ** Code is a little crazy.
+ **
  ** Touch event code is based on work by Mark Billinghurst.
  **
  */
@@ -20,7 +37,7 @@ ArrayList<Card> cards = new ArrayList<Card>();
 
 int max_cards = 8;
 
-PVector translation; 
+PVector translation;
 PVector target_translation;
 PVector offset;
 PVector gyro;
@@ -69,7 +86,7 @@ void setup() {
   gyro = new PVector();
   //set up cards
   target_card = start_card;  // The next card that will be shown on UP event
-  current_card = start_card;// The card currently in view 
+  current_card = start_card;// The card currently in view
 
   submenu = false;
 
@@ -89,7 +106,7 @@ void setup() {
 
   //set the initial translation to show the start_card
   translation.x = -start_card * cards.get(0).size.x;
-  offset.x = -translation.x; 
+  offset.x = -translation.x;
 
   //draw the cards in their initial position
   for (int i = 0; i < max_cards; i++) {
@@ -117,12 +134,12 @@ void draw() {
         cards.get(i).setLocation(loc, 0);
         cards.get(i).drawImage();
       }
-    } 
+    }
     else {
       if (sensor.isStarted()) {
         if (translation.x >= 0 && gyro.y > 0 ) {
           translation.x = 0;
-        } 
+        }
         else if (translation.x <= -cards.get(0).size.x * (cards.get(current_card).children - 1) && gyro.y < 0) {
           translation.x = -cards.get(0).size.x * (cards.get(current_card).children - 1);
         }
@@ -136,7 +153,7 @@ void draw() {
         cards.get(current_card).child_cards.get(j).drawImage();
       }
     }
-  } 
+  }
   else {
     //if there's no UP event yet, translate cards according to finger movement
     if (!submenu) {
@@ -145,12 +162,12 @@ void draw() {
         cards.get(i).setLocation(loc, 0 + (int)translation.y);
         cards.get(i).drawImage();
       }
-    } 
+    }
     else {
       if (sensor.isStarted()) {
         if (translation.x >= 0 && gyro.y > 0 ) {
           translation.x = 0;
-        } 
+        }
         else if (translation.x <= -cards.get(0).size.x * (cards.get(current_card).children - 1) && gyro.y < 0) {
           translation.x = -cards.get(0).size.x * (cards.get(current_card).children - 1);
         }
@@ -184,7 +201,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     ypos = y*touchPadScaleY;
     fingerTouch = 1;
     x_start = xpos;
-    //check what card is in view on the DOWN event to update the current card. 
+    //check what card is in view on the DOWN event to update the current card.
     if (!submenu) {
       for (int i = 0; i < max_cards; i++) {
         int loc_x = (int)cards.get(i).location.x;
@@ -192,7 +209,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
           current_card = i;
         }
       }
-    } 
+    }
     else {
       for (int i = 0; i < cards.get(current_card).child_cards.size(); i++) {
         int loc_x = (int) cards.get(current_card).child_cards.get(i).location.x;
@@ -227,12 +244,12 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     touchEvent = "UP";
     fingerTouch = 0;
 
-    //simple way to check wether we swiped forward or backward on the touchpad   
+    //simple way to check wether we swiped forward or backward on the touchpad
     if (dx > stickiness && !submenu) {
       //we swiped forwards
       if (current_card != max_cards-1)
         target_card = current_card + 1;
-    } 
+    }
     else if (dx < -stickiness && !submenu) {
       //we swiped backwards
       if (current_card != 0)
@@ -241,7 +258,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
 
     //update target_translation for the motion tween
     target_translation.x = -target_card * cards.get(0).size.x;
-    offset.x = -target_translation.x; 
+    offset.x = -target_translation.x;
 
     //if the MOVE motionEvent was given less than 5 times, the user probably wanted to tap. Change menu mode.
     if (!submenu && moves < 5 && cards.get(current_card).children != 0 ) {
@@ -249,23 +266,23 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
       translation.x = 0;
       sensor.start();
       moves = 0;
-    } 
+    }
     else if (submenu && moves < 5) {
       submenu = false;
       translation.x = -cards.get(current_card).size.x * current_card;
       sensor.stop();
       moves = 0;
-    } 
+    }
     else {
       moves = 0;
     }
 
     break;
 
-    //other events 
+    //other events
   default:
     touchEvent = "OTHER (CODE " + action + ")";  // default text on other event
-  } 
+  }
 
   return super.dispatchTouchEvent(event);        // pass data along when done!
 }
@@ -273,4 +290,3 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
 void onGyroscopeEvent(float x, float y, float z, long time, int accuracy) {
   gyro.set(x, y, z);
 }
-

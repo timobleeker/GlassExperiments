@@ -1,7 +1,24 @@
+/*
+* Copyright, 2013, 2014, by Timo Bleeker
+*
+* This collection of experiments is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This collection is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 //timeline mockup
 //Timo Bleeker - July 2013
 
-/** This is a timeline mockup that can be used to implement new interaction techniques. 
+/** This is a timeline mockup that can be used to implement new interaction techniques.
  ** Touch event code is based on work by Mark Billinghurst.
  */
 
@@ -10,12 +27,12 @@ import android.view.MotionEvent;
 ArrayList<Card> cards = new ArrayList<Card>();
 int max_cards = 8;             // Amount of Cards. Make sure there are enough images named 0.jpg to n.jpg
 
-float translation; 
+float translation;
 float target_translation;
 float offset;
 int start_card = 3;            // Card that will be shown on Startup
 int target_card = start_card;  // The next card that will be shown on UP event
-int current_card = start_card; // The card currently in view 
+int current_card = start_card; // The card currently in view
 int stickiness = 50;     // The dx that has to be detected before we move to the next/prev card. Higher means we need to swipe more
 int tween_speed = 20;
 
@@ -46,11 +63,11 @@ void setup() {
   for (int i = 0; i <= max_cards; i++) {
     cards.add(new Card(i + ".jpg", i));
   }
-  
+
   //set the initial translation to show the start_card
   translation = -start_card * cards.get(0).size.x;
-  offset = -translation; 
-  
+  offset = -translation;
+
   //draw the cards in their initial position
   for (int i = 0; i < max_cards; i++) {
     cards.get(i).setLocation((int)(translation + cards.get(i).size.x * i), 0);
@@ -60,7 +77,7 @@ void setup() {
 
 void draw() {
   background(0);
-  
+
   //on UP event, motion tween to target card
   if (touchEvent == "UP") {
     for (int i = 0; i < max_cards; i++) {
@@ -68,7 +85,7 @@ void draw() {
       cards.get(i).setLocation((int)(translation + cards.get(i).size.x * i), 0);
       cards.get(i).drawImage();
     }
-  } 
+  }
   else {
     //if there's no UP event yet, translate cards according to finger movement
     for (int i = 0; i < max_cards; i++) {
@@ -122,29 +139,28 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
   case MotionEvent.ACTION_UP:
     touchEvent = "UP";
     fingerTouch = 0;
-    
-    //simple way to check wether we swiped forward or backward on the touchpad   
+
+    //simple way to check wether we swiped forward or backward on the touchpad
     if (dx > stickiness) {
       //we swiped forwards
       if (current_card != max_cards-1)
         target_card = current_card + 1;
-    } 
+    }
     else if (dx < -stickiness) {
       //we swiped backwards
       if (current_card != 0)
         target_card = current_card - 1;
     }
-    
+
     //update target_translation for the motion tween
     target_translation = -target_card * cards.get(0).size.x;
-    offset = -target_translation; 
+    offset = -target_translation;
     break;
 
-    //other events 
+    //other events
   default:
     touchEvent = "OTHER (CODE " + action + ")";  // default text on other event
-  } 
+  }
 
   return super.dispatchTouchEvent(event);        // pass data along when done!
 }
-

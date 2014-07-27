@@ -1,3 +1,20 @@
+/*
+* Copyright, 2013, 2014, by Timo Bleeker
+*
+* This collection of experiments is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This collection is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 //timeline mockup
 //Timo Bleeker - July 2013
 
@@ -32,11 +49,11 @@ void draw() {
   if (sensor.isStarted()) {
     //for glass use gyro.y, for phone use gyro.x
     rotation+=gyro.y*speed;
-    
+
   } else {
-    rotation = rotation / images[0].width; 
+    rotation = rotation / images[0].width;
     rotation = round(rotation);
-    rotation = rotation * images[0].width;   
+    rotation = rotation * images[0].width;
   }
 
   for (int i = 0; i < images.length; i++) {
@@ -59,7 +76,7 @@ void keyPressed() {
       print("center");
       if (sensor.isStarted()) {
         sensor.stop();
-      } 
+      }
       else {
         sensor.start();
       }
@@ -74,7 +91,7 @@ void onTap(float x, float y)
 {
   if (sensor.isStarted()) {
         sensor.stop();
-      } 
+      }
       else {
         sensor.start();
       }
@@ -89,5 +106,3 @@ public boolean surfaceTouchEvent(MotionEvent event) {
   //forward event to class for processing
   return gesture.surfaceTouchEvent(event);
 }
-
-

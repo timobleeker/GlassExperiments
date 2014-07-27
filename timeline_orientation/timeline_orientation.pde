@@ -1,13 +1,30 @@
+/*
+* Copyright, 2013, 2014, by Timo Bleeker
+*
+* This collection of experiments is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This collection is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 //timeline mockup - Gyro control - absolute
 //Timo Bleeker - July 2013
 
 /** This timeline mockup uses absolute Gyro to look around the cards
  ** Move your head to scroll to cards. To moving your head changes the translation in an absolute manner.
  ** Stop and start the sensor with a tap on the touchpad. The card that's more than half on the screen will snap.
- **  
+ **
  ** Touch event code is based on work by Mark Billinghurst.
  ** I left the the touch code in, for easy hacking
- ** 
+ **
  */
 
 import android.view.MotionEvent;
@@ -21,7 +38,7 @@ int gyro_speed = 100; // Amount of translation per gyro unit. Higher means faste
 ArrayList<Card> cards = new ArrayList<Card>();
 int max_cards = 8;             // Amount of Cards. Make sure there are enough images named 0.jpg to n.jpg
 
-float translation; 
+float translation;
 float target_translation;
 float offset;
 int start_card = 3;            // Card that will be shown on Startup
@@ -65,7 +82,7 @@ void setup() {
 
   //set the initial translation to show the start_card
   translation = -start_card * cards.get(0).size.x;
-  offset = -translation; 
+  offset = -translation;
 
   //draw the cards in their initial position
   for (int i = 0; i < max_cards; i++) {
@@ -80,7 +97,7 @@ void draw() {
   if (sensor.isStarted()) {
     if (translation >= 0 && gyro.y > 0 ) {
       translation = 0;
-    } 
+    }
     else if (translation <= -cards.get(0).size.x * (max_cards - 1) && gyro.y < 0) {
       translation = -cards.get(0).size.x * (max_cards - 1);
     }
@@ -91,7 +108,7 @@ void draw() {
       cards.get(i).setLocation((int)(translation + cards.get(i).size.x * i), 0);
       cards.get(i).drawImage();
     }
-  } 
+  }
   else {
     //snap if the sensor is stopped
     for (int i = 0; i < max_cards; i++) {
@@ -142,18 +159,17 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     fingerTouch = 0;
     if (!sensor.isStarted()) {
       sensor.start();
-    } 
+    }
     else {
       sensor.stop();
       target_translation = round(translation / cards.get(0).size.x) * cards.get(0).size.x;
     }
     break;
 
-    //other events 
+    //other events
   default:
     touchEvent = "OTHER (CODE " + action + ")";  // default text on other event
-  } 
+  }
 
   return super.dispatchTouchEvent(event);        // pass data along when done!
 }
-

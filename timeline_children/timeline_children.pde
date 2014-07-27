@@ -1,7 +1,24 @@
+/*
+* Copyright, 2013, 2014, by Timo Bleeker
+*
+* This collection of experiments is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This collection is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 //timeline Vertical Children
 //Timo Bleeker - July 2013
 
-/** This is a timeline that shows child cards (or cards within a bundle) in a vertical timeline. 
+/** This is a timeline that shows child cards (or cards within a bundle) in a vertical timeline.
  ** I haven't figured out how to check if files exist with Processing for Android, since apparently
  ** the sketch data folder on android is not created. I currently don't know where it actually stores the images.
  ** Because of this, we have to load child cards manually (we can't check if they are there and then add them).
@@ -15,13 +32,13 @@ ArrayList<Card> cards = new ArrayList<Card>();
 
 int max_cards = 16;             // Amount of Cards. Make sure there are enough images named 0.jpg to n.jpg
 
-PVector translation; 
+PVector translation;
 PVector target_translation;
 PVector offset;
 
 int start_card = 3;            // Card that will be shown on Startup
 int target_card;  // The next card that will be shown on UP event
-int current_card; // The card currently in view 
+int current_card; // The card currently in view
 int current_card_y = 0;
 int target_card_y;
 
@@ -58,7 +75,7 @@ void setup() {
 
   //set up cards
   target_card = start_card;  // The next card that will be shown on UP event
-  current_card = start_card;// The card currently in view 
+  current_card = start_card;// The card currently in view
   target_card_y = current_card_y;
 
   //set the touch scale factor
@@ -82,7 +99,7 @@ void setup() {
   /* while (max == false) {
    println("added child card: " + j);
    cards.get(n).addChild(n + "-" + j + ".jpeg", n, j);
-   if (cards.get(n).child_cards.get(j). == null) { 
+   if (cards.get(n).child_cards.get(j). == null) {
    cards.get(n).removeChild(j);
    max = true;
    }
@@ -94,7 +111,7 @@ void setup() {
    */
 
   //at the moment we have to add the child cards manually to each card with .addChild(String filename, int parentcard, int, cardnumber)
-  cards.get(2).addChild("2-0.jpeg", 2, 0);   
+  cards.get(2).addChild("2-0.jpeg", 2, 0);
   //add menu cards for card 3
   for (int i = 0; i < 7; i++) {
     cards.get(3).addChild("3-" + i + ".jpeg", 3, i);
@@ -105,7 +122,7 @@ void setup() {
 
   //set the initial translation to show the start_card
   translation.x = -start_card * cards.get(0).size.x;
-  offset.x = -translation.x; 
+  offset.x = -translation.x;
 
   //draw the cards in their initial position
   for (int i = 0; i < max_cards; i++) {
@@ -142,7 +159,7 @@ void draw() {
         }
       }
     }
-  } 
+  }
   else {
     //if there's no UP event yet, translate cards according to finger movement
     for (int i = 0; i < max_cards; i++) {
@@ -175,7 +192,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     ypos = y*touchPadScaleY;
     fingerTouch = 1;
     x_start = xpos;
-    //check what card is in view on the DOWN event to update the current card. 
+    //check what card is in view on the DOWN event to update the current card.
     for (int i = 0; i < max_cards; i++) {
       int loc_x = (int)cards.get(i).location.x;
       if (loc_x > -25 && loc_x < 25) {
@@ -204,7 +221,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
 
       translation.x = dx + offset.x;
       translation.x = -translation.x;
-    } 
+    }
     else {
       translation.y = dx + offset.y;
       translation.y = -translation.y;
@@ -220,22 +237,22 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     touchEvent = "UP";
     fingerTouch = 0;
 
-    //simple way to check wether we swiped forward or backward on the touchpad   
+    //simple way to check wether we swiped forward or backward on the touchpad
     if (dx > stickiness && !scroll_vertical) {
       //we swiped forwards
       if (current_card != max_cards-1)
         target_card = current_card + 1;
-    } 
+    }
     else if (dx < -stickiness && !scroll_vertical) {
       //we swiped backwards
       if (current_card != 0)
         target_card = current_card - 1;
-    } 
+    }
     else if (dx > stickiness && scroll_vertical) {
       //we swiped forwards
       if (current_card_y < cards.get(current_card).children) //change this to y max cards
         target_card_y = current_card_y + 1;
-    } 
+    }
     else if (dx < -stickiness && scroll_vertical) {
       //we swiped backwards
       if (current_card_y != 0) {
@@ -251,14 +268,14 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     target_translation.x = -target_card * cards.get(0).size.x;
     target_translation.y = -target_card_y * cards.get(0).size.y;
     //println(target_translation.y);
-    offset.x = -target_translation.x; 
-    offset.y = -target_translation.y; 
+    offset.x = -target_translation.x;
+    offset.y = -target_translation.y;
 
     //if the MOVE motionEvent was given less than 5 times, the user probably wanted to tap. Change scrolling mode.
     if (!scroll_vertical && moves < 5 && cards.get(current_card).children != 0 ) {
       scroll_vertical = true;
       moves = 0;
-    } 
+    }
     else if (moves < 5) {
       scroll_vertical = false;
       translation.y = 0;
@@ -267,7 +284,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
       current_card_y = 0;
       target_card_y = 0;
       moves = 0;
-    } 
+    }
     else {
       moves = 0;
     }
@@ -286,11 +303,10 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
 
     break;
 
-    //other events 
+    //other events
   default:
     touchEvent = "OTHER (CODE " + action + ")";  // default text on other event
-  } 
+  }
 
   return super.dispatchTouchEvent(event);        // pass data along when done!
 }
-

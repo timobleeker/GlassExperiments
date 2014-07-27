@@ -1,8 +1,25 @@
+/*
+* Copyright, 2013, 2014, by Timo Bleeker
+*
+* This collection of experiments is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This collection is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 //timeline mockup - Gyro control - relative
 //Timo Bleeker - July 2013
 
 /** This timeline mockup uses relative Gyro to look around the cards
- ** Move your head slightly to the right to start scrolling. Move back to stop. 
+ ** Move your head slightly to the right to start scrolling. Move back to stop.
  ** Currently using the gyro which doesn't really make sense I think, accelerometer would be better.
  ** Touch event code is based on work by Mark Billinghurst.
  ** I left the the touch code in, for easy hacking
@@ -20,13 +37,13 @@ float gyro_speed = .5; // Amount of translation per gyro unit. Higher means fast
 ArrayList<Card> cards = new ArrayList<Card>();
 int max_cards = 8;             // Amount of Cards. Make sure there are enough images named 0.jpg to n.jpg
 
-float translation; 
+float translation;
 float target_translation;
 float offset;
 float accel;
 int start_card = 3;            // Card that will be shown on Startup
 int target_card = start_card;  // The next card that will be shown on UP event
-int current_card = start_card; // The card currently in view 
+int current_card = start_card; // The card currently in view
 int stickiness = 3;            // The accel that has to be detected before we move to the next/prev card. Higher means we need to move more
 int tween_speed = 20;
 
@@ -66,7 +83,7 @@ void setup() {
 
   //set the initial translation to show the start_card
   translation = -start_card * cards.get(0).size.x;
-  offset = -translation; 
+  offset = -translation;
 
   //draw the cards in their initial position
   for (int i = 0; i < max_cards; i++) {
@@ -83,19 +100,19 @@ void draw() {
   //Move if the accel is above or below the stickeness and -stickiness, otherwise snap.
   if (accel < stickiness && accel > - stickiness)
   {
-    target_translation = round(translation / cards.get(0).size.x) * cards.get(0).size.x;  
+    target_translation = round(translation / cards.get(0).size.x) * cards.get(0).size.x;
     for (int i = 0; i < max_cards; i++) {
       translation += (target_translation - translation)/tween_speed;
       cards.get(i).setLocation((int)(translation + cards.get(i).size.x * i), 0);
       cards.get(i).drawImage();
     }
-  }    
+  }
   else {
     //don't move further on the first and last cards
     if (translation >= 0 && accel > 0 ) {
       translation = 0;
       accel = 0;
-    } 
+    }
     else if (translation <= -cards.get(0).size.x * (max_cards - 1) && accel < 0) {
       translation = -cards.get(0).size.x * (max_cards - 1);
       accel = 0;
@@ -158,7 +175,7 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     fingerTouch = 0;
     if (!sensor.isStarted()) {
       sensor.start();
-    } 
+    }
     else {
       sensor.stop();
       accel = 0;
@@ -166,11 +183,10 @@ public boolean dispatchGenericMotionEvent(MotionEvent event) {
     }
     break;
 
-    //other events 
+    //other events
   default:
     touchEvent = "OTHER (CODE " + action + ")";  // default text on other event
-  } 
+  }
 
   return super.dispatchTouchEvent(event);        // pass data along when done!
 }
-
