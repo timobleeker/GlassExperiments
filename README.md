@@ -8,7 +8,7 @@ broken, as it hasn't been fully tested for recent versions of the Glass OS.
 
 Setup [Processing for Android](http://wiki.processing.org/w/Android)
 
-### Dependancies
+### Dependencies
 
 Download and put in your Processing Libraries folder.
 
